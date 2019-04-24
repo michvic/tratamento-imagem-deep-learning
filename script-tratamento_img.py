@@ -26,18 +26,27 @@ for pasta in dir:
     if os.path.isdir(ROOT_PATH + '/' + pasta):
         labels[pasta] = count # cria os labels relacionando um dicetorio com um número
 
-        # countImg = 1
+        os.mkdir(ROOT_PATH + '/class-' + str(count))
+
+        countImg = 1
         for pathImg in glob.glob(ROOT_PATH + '/' + pasta + '/*' + EXTESAO_IMG):
 
-            imageNumpy = plt.imread(pathImg)
-            myImage = np.array(Image.fromarray(imageNumpy).resize((num_px, num_py))).reshape((1, num_px*num_py*3)).T
+            image = Image.open(pathImg)
+            newImage = image.resize((num_px, num_py))
+            newImage.save(ROOT_PATH+'/class-'+str(count)+'/'+str(countImg)+EXTESAO_IMG )
+
+
+            # imageNumpy = plt.imread(pathImg)
+            # myImage = np.array(Image.fromarray(imageNumpy).resize((num_px, num_py))).reshape((1, num_px*num_py*3)).T
+
+
             # print("shape original: ", imageNumpy)
             # plt.imshow(imageNumpy)
             # plt.show()
 
         #     data[:, countImg] = np.squeeze(myImage)[0]
-        #     countImg += 1
+            countImg += 1
         #
         # sio.savemat('data-'+str(count), dict(data=data))
-        # count += 1
+        count += 1
 
