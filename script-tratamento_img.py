@@ -11,16 +11,44 @@ EXTESAO_IMG = '.jpg'
 
 num_px = 90
 num_py = 100
-# nx = num_px*num_px*3
-# m = 120
-# data = np.zeros((nx,m))
+
+
+def validaImagem(imagem : Image) -> bool:
+    print(imagem)
+    if (imagem.size[0] >= num_px or imagem.size[1] >= num_py):
+        return True
+    return False
+
+def paths(baseFolderName):
+    ROOT_PATH = os.path.abspath('./'+baseFolderName)  # retorna o caminho completo da base de imagem
+    name = 'new_base-1'
+
+    while True:
+
+        try:
+            os.mkdir(name)
+            break
+
+        except FileExistsError:
+            name = name.split('-')
+            name = name[0]+'-'+str(int(name[1])+1)
+            os.mkdir(name)
+            break
+        except:
+            continue
+
+
+
+    NEW_BASE = os.path.abspath(name)
+
+    return ROOT_PATH, NEW_BASE
+
 
 ROOT_PATH = os.path.abspath('./base')#retorna o caminho completo da pasta ./base
 NEW_BASE = os.path.abspath('./base-2')
 dir = os.listdir(ROOT_PATH)# lista todosarquivos/pastas do diretorio ./base
 
 labels = {}
-data = {}
 
 count = 1
 for pasta in dir:
@@ -33,21 +61,18 @@ for pasta in dir:
         for pathImg in glob.glob(ROOT_PATH + '/' + pasta + '/*' + EXTESAO_IMG):
 
             image = Image.open(pathImg)
-            newImage = image.resize((num_px, num_py))
-            newImage.save(NEW_BASE + '/class-' + str(count)+'/'+str(countImg)+EXTESAO_IMG )
-
+            if validaImagem(image):
+                newImage = image.resize((num_px, num_py))
+                newImage.save(NEW_BASE + '/class-' + str(count)+'/'+str(countImg)+EXTESAO_IMG )
+            else:
+                continue
 
             # imageNumpy = plt.imread(pathImg)
             # myImage = np.array(Image.fromarray(imageNumpy).resize((num_px, num_py))).reshape((1, num_px*num_py*3)).T
-
-
             # print("shape original: ", imageNumpy)
             # plt.imshow(imageNumpy)
             # plt.show()
 
-        #     data[:, countImg] = np.squeeze(myImage)
             countImg += 1
-        #
-        # sio.savemat('data-'+str(count), dict(data=data))
         count += 1
 
