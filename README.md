@@ -1,2 +1,5 @@
 # tratamento-img
-Projeto de algoritmo para o tratamento de imagem para uso em deep learning
+
+Projeto de pesquisa com o intuito criar algoritmo para o tratamento (redimensionamento) de imagem para uso em deep learning.
+
+orientador: http://lattes.cnpq.br/2616572481839756
