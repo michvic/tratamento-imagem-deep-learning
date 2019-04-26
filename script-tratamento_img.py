@@ -11,16 +11,46 @@ EXTESAO_IMG = '.jpg'
 
 num_px = 90
 num_py = 100
-# nx = num_px*num_px*3
-# m = 120
-# data = np.zeros((nx,m))
 
-ROOT_PATH = os.path.abspath('./base')#retorna o caminho completo da pasta ./base
-NEW_BASE = os.path.abspath('./base-2')
+
+def validaImagem(imagem : Image, taxaDeDiferenca=None) -> bool:
+    width, height = 0, 0
+
+    if taxaDeDiferenca:
+        width, height = (taxaDeDiferenca * num_px, taxaDeDiferenca * num_py)
+
+    if imagem.size[0] >= (num_px - width) or imagem.size[0] >= (num_py - height):
+        return True
+    return False
+
+def paths(baseFolderName):
+    ROOT_PATH = ''
+    name = 'new_' + baseFolderName + '-1'
+
+    if os.path.exists('./'+baseFolderName):
+        ROOT_PATH = os.path.abspath('./'+baseFolderName)  # retorna o caminho completo da base de imagem
+    else:
+        print("ErroFolder: '"+baseFolderName+"' Not Found")
+        exit()
+
+    while True:
+        if os.path.exists('./'+name):
+            name = name.split('-')
+            name = name[0] + '-' + str(int(name[1]) + 1)
+        else:
+            os.mkdir(name)
+
+            break
+
+    NEW_BASE = os.path.abspath('./' + name)
+
+    return ROOT_PATH, NEW_BASE
+
+
+ROOT_PATH, NEW_BASE = paths(baseFolderName='base_plantas') # nome da pasta onde se encontra a base de imagens
 dir = os.listdir(ROOT_PATH)# lista todosarquivos/pastas do diretorio ./base
 
 labels = {}
-data = {}
 
 count = 1
 for pasta in dir:
@@ -33,21 +63,19 @@ for pasta in dir:
         for pathImg in glob.glob(ROOT_PATH + '/' + pasta + '/*' + EXTESAO_IMG):
 
             image = Image.open(pathImg)
-            newImage = image.resize((num_px, num_py))
-            newImage.save(NEW_BASE + '/class-' + str(count)+'/'+str(countImg)+EXTESAO_IMG )
-
+            if validaImagem(image, 0.1):
+                newImage = image.resize((num_px, num_py))
+                newImage.save(NEW_BASE + '/class-' + str(count)+'/'+str(countImg)+EXTESAO_IMG )
+            else:
+                continue
 
             # imageNumpy = plt.imread(pathImg)
             # myImage = np.array(Image.fromarray(imageNumpy).resize((num_px, num_py))).reshape((1, num_px*num_py*3)).T
-
-
-            # print("shape original: ", imageNumpy)
+            # print("shape original: ", imageNumpy.shape)
             # plt.imshow(imageNumpy)
             # plt.show()
 
-        #     data[:, countImg] = np.squeeze(myImage)
             countImg += 1
-        #
-        # sio.savemat('data-'+str(count), dict(data=data))
+            break
         count += 1
 
