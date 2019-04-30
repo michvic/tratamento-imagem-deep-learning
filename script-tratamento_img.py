@@ -8,6 +8,7 @@ import os
 import glob
 
 EXTESAO_IMG = '.jpg'
+TAXA_DIFERENCA = 0.3
 
 num_px = 90
 num_py = 100
@@ -47,25 +48,33 @@ def paths(baseFolderName):
     return ROOT_PATH, NEW_BASE
 
 
+
+""""" Main """""
+
 ROOT_PATH, NEW_BASE = paths(baseFolderName='base_plantas') # nome da pasta onde se encontra a base de imagens
 dir = os.listdir(ROOT_PATH)# lista todosarquivos/pastas do diretorio ./base
 
+dataPre = []
+dataPos = []
+columns = []
 labels = {}
+
+
 
 count = 1
 for pasta in dir:
     if os.path.isdir(ROOT_PATH + '/' + pasta):
-        labels[pasta] = count # cria os labels relacionando um dicetorio com um número
-
-        os.mkdir(NEW_BASE + '/class-' + str(count))
+        labels[count] = ''.join(pasta.split('-')[0:2])  # cria os labels relacionando um dicetorio com um número
+        os.mkdir(NEW_BASE + '/'+ labels[count] +'- '+ str(count))
 
         countImg = 1
-        for pathImg in glob.glob(ROOT_PATH + '/' + pasta + '/*' + EXTESAO_IMG):
+        imgagens = glob.glob(ROOT_PATH + '/' + pasta + '/*' + EXTESAO_IMG)
+        for pathImg in imgagens:
 
             image = Image.open(pathImg)
-            if validaImagem(image, 0.1):
+            if validaImagem(image, TAXA_DIFERENCA):
                 newImage = image.resize((num_px, num_py))
-                newImage.save(NEW_BASE + '/class-' + str(count)+'/'+str(countImg)+EXTESAO_IMG )
+                newImage.save(NEW_BASE + '/'+ labels[count] +'- '+ str(count)+'/'+str(countImg)+EXTESAO_IMG )
             else:
                 continue
 
@@ -76,6 +85,12 @@ for pasta in dir:
             # plt.show()
 
             countImg += 1
-            break
+
+        columns.append(labels[count])
+        dataPos.append(countImg)
+        dataPre.append(len(imgagens))
         count += 1
 
+
+df = pd.DataFrame(data=[dataPos,dataPre],index=['Nº Imagens pós tratamento', 'Nº Imagens pré tratamento'] ,columns=columns)
+df.to_csv(NEW_BASE+'/dados da base.csv')
