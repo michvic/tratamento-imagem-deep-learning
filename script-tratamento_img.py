@@ -47,16 +47,13 @@ def paths(baseFolderName):
 
     return ROOT_PATH, NEW_BASE
 
-
-
 """"" Main """""
 
 ROOT_PATH, NEW_BASE = paths(baseFolderName='base') # nome da pasta onde se encontra a base de imagens
 dir = os.listdir(ROOT_PATH)# lista todosarquivos/pastas do diretorio ./base
 dir.sort()
 
-dataPre = []
-dataPos = []
+data = [[],[],[]] # iterador, preTratamento, posTratamento
 columns = []
 labels = {}
 
@@ -88,11 +85,11 @@ for pasta in dir:
 
             countImg += 1
 
-        columns.append(labels[count])
-        dataPos.append(countImg)
-        dataPre.append(len(imgagens))
+        data[0].append(labels[count])
+        data[1].append(len(imgagens))
+        data[2].append(countImg)
+
         count += 1
 
-
-df = pd.DataFrame(data= dataPos,index=columns,columns=['Nº Imagens pós tratamento'])
+df = pd.DataFrame(data= np.array(data).T,columns=['Classes','Nº Imagens pré tratamento','Nº Imagens pós tratamento'])
 df.to_csv(NEW_BASE+'/dados da base.csv')
