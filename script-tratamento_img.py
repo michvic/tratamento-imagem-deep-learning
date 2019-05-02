@@ -51,8 +51,9 @@ def paths(baseFolderName):
 
 """"" Main """""
 
-ROOT_PATH, NEW_BASE = paths(baseFolderName='base_plantas') # nome da pasta onde se encontra a base de imagens
+ROOT_PATH, NEW_BASE = paths(baseFolderName='base') # nome da pasta onde se encontra a base de imagens
 dir = os.listdir(ROOT_PATH)# lista todosarquivos/pastas do diretorio ./base
+dir.sort()
 
 dataPre = []
 dataPos = []
@@ -63,11 +64,12 @@ labels = {}
 
 count = 1
 for pasta in dir:
+    print(count,"/",len(dir))
     if os.path.isdir(ROOT_PATH + '/' + pasta):
         labels[count] = ''.join(pasta.split('-')[0:2])  # cria os labels relacionando um dicetorio com um número
         os.mkdir(NEW_BASE + '/'+ labels[count] +'- '+ str(count))
 
-        countImg = 1
+        countImg = 0
         imgagens = glob.glob(ROOT_PATH + '/' + pasta + '/*' + EXTESAO_IMG)
         for pathImg in imgagens:
 
@@ -92,5 +94,5 @@ for pasta in dir:
         count += 1
 
 
-df = pd.DataFrame(data=[dataPos,dataPre],index=['Nº Imagens pós tratamento', 'Nº Imagens pré tratamento'] ,columns=columns)
+df = pd.DataFrame(data= dataPos,index=columns,columns=['Nº Imagens pós tratamento'])
 df.to_csv(NEW_BASE+'/dados da base.csv')
