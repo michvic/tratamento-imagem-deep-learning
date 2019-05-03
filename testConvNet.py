@@ -2,7 +2,7 @@
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
-import pandas as pd
+#import pandas as pd
 import scipy.io as sio
 from scipy import ndimage
 import os
@@ -20,9 +20,9 @@ tic = time.clock() # medir tempo de execução do script
 ext_img = '.jpg'
 num_px = 90
 num_py = 100
-base_name = './base-testCinvNet' # main folder
-num_classes = 38        # number of classes
-total_imgs = 20013      # total of images considering all classes
+base_name = './base-testConvNet' # main folder
+num_classes = 35        # number of classes
+total_imgs = 16548      # total of images considering all classes
 
 ROOT_PATH = os.path.abspath(base_name)#retorna o caminho completo da pasta ./base
 dir = os.listdir(ROOT_PATH)# lista todos arquivos/pastas do diretorio ./base

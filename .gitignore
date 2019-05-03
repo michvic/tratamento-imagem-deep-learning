@@ -1,4 +1,5 @@
 .idea/
+venv/
 base/
 base-testConvNet/
 base_compactada/
