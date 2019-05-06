@@ -7,9 +7,9 @@ orientador: http://lattes.cnpq.br/2616572481839756
 estrutura de pasta nescessária para rodar o script
 
     projeto
-        
-  |__ base/pasta
-  
-        |__ classes/pasta
-
-              |__ imagem/arquivo
+       |
+       |__ base/pasta
+            |
+            |__ classes/pasta
+                |
+                |__ imagem/arquivo
