@@ -8,9 +8,9 @@ import os
 import glob
 
 EXTESAO_IMG = '.jpg'
-TAXA_DIFERENCA = 0.3
+TAXA_DIFERENCA = 0.4
 
-num_px = 90
+num_px = 100
 num_py = 100
 
 
