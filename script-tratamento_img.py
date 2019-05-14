@@ -20,7 +20,7 @@ def validaImagem(imagem : Image, taxaDeDiferenca=None) -> bool:
     if taxaDeDiferenca:
         width, height = (taxaDeDiferenca * num_px, taxaDeDiferenca * num_py)
 
-    if imagem.size[0] >= (num_px - width) or imagem.size[0] >= (num_py - height):
+    if imagem.size[1] >= (num_px - width) or imagem.size[0] >= (num_py - height):
         return True
     return False
 
@@ -68,8 +68,8 @@ for pasta in dir:
         os.mkdir(NEW_BASE + '/'+ labels[count] +'- '+ str(count))
 
         countImg = 0
-        imgagens = glob.glob(ROOT_PATH + '/' + pasta + '/*' + EXTESAO_IMG)
-        for pathImg in imgagens:
+        imagens = glob.glob(ROOT_PATH + '/' + pasta + '/*' + EXTESAO_IMG)
+        for pathImg in imagens:
 
             image = Image.open(pathImg)
             if validaImagem(image, TAXA_DIFERENCA):
@@ -98,5 +98,6 @@ for pasta in dir:
 data[0].append('Total')
 data[1].append(sum(data[1]))
 data[2].append(sum(data[2]))
+
 df = pd.DataFrame(data= np.array(data).T,columns=['Classes','Nº Imagens pré tratamento','Nº Imagens pós tratamento'])
 df.to_csv(NEW_BASE+'/dados da base.csv')
