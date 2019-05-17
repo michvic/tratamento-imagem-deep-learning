@@ -10,6 +10,6 @@ estrutura de pasta nescessária para rodar o script
        |
        |__ base/pasta
             |
-            |__ classes/pasta
+            |__ classe/pasta
                 |
                 |__ imagem/arquivo
