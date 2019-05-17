@@ -20,7 +20,7 @@ def validaImagem(imagem : Image, taxaDeDiferenca=None) -> bool:
     if taxaDeDiferenca:
         width, height = (taxaDeDiferenca * num_px, taxaDeDiferenca * num_py)
 
-    if imagem.size[1] >= (num_px - width) or imagem.size[0] >= (num_py - height):
+    if imagem.size[1] >= (num_px - width) and imagem.size[0] >= (num_py - height):
         return True
     return False
 
