@@ -1,4 +1,4 @@
-## crie uma pasta com o nome 'base', na raiz do projeto onde esse escript vai ser executado
+
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
@@ -58,8 +58,6 @@ data = [[],[],[]] # nameClass, preTratamento, posTratamento
 columns = []
 labels = {}
 
-
-
 count = 1
 for pasta in dir:
     print(count,"/",len(dir))
@@ -88,16 +86,16 @@ for pasta in dir:
 
 
         data[0].append(labels[count])
-        data[1].append(len(imgagens))
+        data[1].append(len(imagens))
         data[2].append(countImg)
 
         count += 1
 
 
 
-data[0].append('Total')
-data[1].append(sum(data[1]))
-data[2].append(sum(data[2]))
+data[0].insert(0,'Total')
+data[1].insert(0,sum(data[1]))
+data[2].insert(0,sum(data[2]))
 
 df = pd.DataFrame(data= np.array(data).T,columns=['Classes','Nº Imagens pré tratamento','Nº Imagens pós tratamento'])
 df.to_csv(NEW_BASE+'/dados da base.csv')
