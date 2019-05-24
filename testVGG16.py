@@ -1,28 +1,25 @@
 ## crie uma pasta com o nome 'base', na raiz do projeto onde esse escript vai ser executado
 import numpy as np
-from PIL import Image
 import matplotlib.pyplot as plt
-#import pandas as pd
-import scipy.io as sio
 from scipy import ndimage
 import os
 import glob
 from sklearn.model_selection import train_test_split
 from keras.utils.np_utils import to_categorical # convert to one-hot-encoding
-from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Activation, Dropout, Flatten, Dense
 from keras.preprocessing.image import ImageDataGenerator
-import time
-
-tic = time.clock() # medir tempo de execução do script
+from sklearn.metrics import confusion_matrix
+from keras.applications.vgg16 import VGG16
+from keras.applications.inception_v3 import InceptionV3
+from keras.models import Model
+from keras.models import Sequential
 
 ext_img = '.jpg'
 num_px = 90
 num_py = 100
-base_name = './base-testConvNet' # main folder
-num_classes = 10        # number of classes
-total_imgs = 5415     # total of images considering all classes
+base_name = './base-3' # main folder
+num_classes = 6        # number of classes
+total_imgs = 3457      # total of images considering all classes
 
 ROOT_PATH = os.path.abspath(base_name)#retorna o caminho completo da pasta ./base
 dir = os.listdir(ROOT_PATH)# lista todos arquivos/pastas do diretorio ./base
@@ -82,33 +79,20 @@ print("Test shape" + str(x_test.shape))
 # Set the CNN model
 input_shape = (num_py, num_px, 3)
 
-model = Sequential()
-model.add(Conv2D(32, (3, 3), input_shape=input_shape))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
+base_model = VGG16(include_top=False, weights='imagenet', input_shape=input_shape)#weights=None
+model = base_model.output
+model = Flatten()(model)
+model = Dense(128, activation='relu')(model)
+model = Dropout(0.5)(model)
+predictions = Dense(num_classes, activation='softmax')(model)
+model = Model(inputs=base_model.input, outputs=predictions)
 
-model.add(Conv2D(32, (3, 3)))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-model.add(Conv2D(64, (3, 3)))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-model.add(Conv2D(64, (3, 3)))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-model.add(Conv2D(64, (3, 3)))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
-model.add(Dense(64))
-model.add(Activation('relu'))
-model.add(Dropout(0.5))
-model.add(Dense(num_classes))
-model.add(Activation('softmax'))
+# First: train only the top layers (which were randomly initialized)
+# quando usar imagenet
+for layer in base_model.layers:
+#for layer in base_model.layers[:15]:#fine-tunning one more convlayer
+    layer.trainable = False
+model.summary()
 
 # Define the optimizer
 # Compile the model
@@ -144,7 +128,7 @@ validation_generator = test_datagen.flow(x_val, y_val, batch_size=batch_size)
 history = model.fit_generator(
         train_generator,
         steps_per_epoch=2000 // batch_size,
-        epochs=100,
+        epochs=15,
         validation_data=validation_generator,
         validation_steps=800 // batch_size,
         #callbacks=callbacks_list
@@ -174,11 +158,7 @@ print("\n%s: %.2f%% (Val)" % (model.metrics_names[1], scores[1]*100))
 scores = model.evaluate(X_test, y_test, batch_size=1, verbose=0)
 print("\n%s: %.2f%% (Test)" % (model.metrics_names[1], scores[1]*100))
 
-
+pred_test = np.argmax(model.predict(X_test, batch_size=1, verbose=0), axis=1)
+true_test = np.argmax(y_test, axis=1)
+print(confusion_matrix(true_test, pred_test))
 plt.show()
-
-toc = time.clock()
-
-t_ms = 1000*(toc - tic)
-t_m = t_ms/(1000*60)
-print("\n ----- Tempo = " + str(t_ms) + "ms, " + str(t_m) + "min\n")
