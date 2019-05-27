@@ -26,7 +26,7 @@ def validaImagem(imagem : Image, taxaDeDiferenca=None) -> bool:
 
 def paths(baseFolderName):
     ROOT_PATH = ''
-    name = "new" + baseFolderName +"-"+ str(num_px) + '-' + str(num_py) +'-1'
+    name = str(num_px) + '-' + str(num_py)+ '-' +"new" + baseFolderName +'-1'
 
     if os.path.exists('./'+baseFolderName):
         ROOT_PATH = os.path.abspath('./'+baseFolderName)  # retorna o caminho completo da base de imagem
@@ -37,7 +37,7 @@ def paths(baseFolderName):
     while True:
         if os.path.exists('./'+name):
             name = name.split('-')
-            name = name[0] + '-' + str(int(name[1]) + 1)
+            name = name[0:3] + '-' + str(int(name[1]) + 1)
         else:
             os.mkdir(name)
 
@@ -54,7 +54,7 @@ ROOT_PATH, NEW_BASE = paths(baseFolderName='base') # nome da pasta onde se encon
 dir = os.listdir(ROOT_PATH)# lista todosarquivos/pastas do diretorio ./base
 dir.sort()
 
-data = [[],[],[]] # nameClass, preTratamento, posTratamento
+data = [[],[],[]] #nameClass, preTratamento, posTratamento
 columns = []
 labels = {}
 
@@ -72,7 +72,7 @@ for pasta in dir:
             image = Image.open(pathImg)
             if validaImagem(image, TAXA_DIFERENCA):
                 newImage = image.resize((num_px, num_py))
-                newImage.save(NEW_BASE + '/'+ labels[count] +'- '+ str(count)+'/'+str(countImg)+EXTESAO_IMG )
+                newImage.save(NEW_BASE + '/'+ str(count)+ '-'+ labels[count] +'/'+str(countImg)+EXTESAO_IMG )
             else:
                 continue
 
@@ -83,7 +83,6 @@ for pasta in dir:
             # plt.show()
 
             countImg += 1
-
 
         data[0].append(labels[count])
         data[1].append(len(imagens))
@@ -97,5 +96,10 @@ data[0].insert(0,'Total')
 data[1].insert(0,sum(data[1]))
 data[2].insert(0,sum(data[2]))
 
+data[0].append('detalhes')
+data[1].append('taxa de deferença:' + str(TAXA_DIFERENCA))
+data[2].append("Dimensão: ({},{})".format(num_px,num_py))
+
 df = pd.DataFrame(data= np.array(data).T,columns=['Classes','Nº Imagens pré tratamento','Nº Imagens pós tratamento'])
 df.to_csv(NEW_BASE+'/dados da base.csv')
+
