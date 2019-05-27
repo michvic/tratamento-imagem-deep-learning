@@ -26,7 +26,7 @@ def validaImagem(imagem : Image, taxaDeDiferenca=None) -> bool:
 
 def paths(baseFolderName):
     ROOT_PATH = ''
-    name = 'new_' + baseFolderName + '-1'
+    name = "new" + baseFolderName +"-"+ str(num_px) + '-' + str(num_py) +'-1'
 
     if os.path.exists('./'+baseFolderName):
         ROOT_PATH = os.path.abspath('./'+baseFolderName)  # retorna o caminho completo da base de imagem
@@ -63,7 +63,7 @@ for pasta in dir:
     print(count,"/",len(dir))
     if os.path.isdir(ROOT_PATH + '/' + pasta):
         labels[count] = ''.join(pasta.split('-')[0:2])  # cria os labels relacionando um dicetorio com um número
-        os.mkdir(NEW_BASE + '/'+ labels[count] +'- '+ str(count))
+        os.mkdir(NEW_BASE + '/'+ str(count) + "-" + labels[count])
 
         countImg = 0
         imagens = glob.glob(ROOT_PATH + '/' + pasta + '/*' + EXTESAO_IMG)
