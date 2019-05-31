@@ -8,11 +8,10 @@ import os
 import glob
 
 EXTESAO_IMG = '.jpg'
-TAXA_DIFERENCA = 0
+TAXA_DIFERENCA = 0.2
 
-num_px = 32
-num_py = 32
-
+num_px = 64
+num_py = 64
 
 def validaImagem(imagem : Image, taxaDeDiferenca=None) -> bool:
     width, height = 0, 0
@@ -65,7 +64,7 @@ for pasta in dir:
         os.mkdir(NEW_BASE + '/'+ str(count) + "-" + labels[count].rstrip(' '))
 
         countImg = 0
-        imagens = glob.glob(ROOT_PATH + '/' + pasta + '/*' + EXTESAO_IMG)
+        imagens = glob.glob(ROOT_PATH + '/' + pasta + '/*')
         for pathImg in imagens:
 
             image = Image.open(pathImg)

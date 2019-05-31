@@ -20,9 +20,9 @@ from keras.models import Sequential
 ext_img = '.jpg'
 num_px = 32
 num_py = 32
-base_name = './bases-testes/32-32-newbase-1' # main folder
-num_classes = 20      # number of classes
-total_imgs = 27340     # total of images considering all classes
+base_name = './bases-testes/class' # main folder
+num_classes = 1      # number of classes
+total_imgs = 149     # total of images considering all classes
 
 ROOT_PATH = os.path.abspath(base_name)#retorna o caminho completo da pasta ./base
 dir = os.listdir(ROOT_PATH)# lista todos arquivos/pastas do diretorio ./base
@@ -122,11 +122,20 @@ def save_bottlebeck_features():
 
 def train_top_model():
     print("------- train_top_model -------")
+    if(not os.path.exists(bottlebeck_path+'resultado.txt')):
+        arquivo = open(bottlebeck_path+'resultado.txt', 'w')
+    else:
+        arquivo = open(bottlebeck_path+'resultado.txt', 'r')
+
+    conteudo = arquivo.readlines()
+    conteudo.append('#####################################################################################################')
+
+
     train_data = np.load(open(bottlebeck_path+'bottleneck_features_train.npy', 'rb'))
     validation_data = np.load(open(bottlebeck_path+'bottleneck_features_validation.npy', 'rb'))
     test_data = np.load(open(bottlebeck_path+'bottleneck_features_test.npy', 'rb'))
 
-    neurons = 512
+    neurons = 1024
     model = Sequential()
     model.add(Flatten(input_shape=train_data.shape[1:]))
     model.add(Dense(neurons, activation='relu'))
@@ -146,19 +155,28 @@ def train_top_model():
               )
     model.save_weights(bottlebeck_path+'bottleneck_fc_model-{}.h5'.format(neurons))
     model.summary()
+    conteudo.append(model.summary())
 
     scores = model.evaluate(test_data, y_test, batch_size=1, verbose=0)
     print("\n%s: %.2f%% (Test)" % (model.metrics_names[1], scores[1]*100))
+    conteudo.append("\n%s: %.2f%% (Test)" % (model.metrics_names[1], scores[1]*100))
 
     pred_test = np.argmax(model.predict(test_data, batch_size=1, verbose=0), axis=1)
     true_test = np.argmax(y_test, axis=1)
     cf = confusion_matrix(true_test, pred_test)
     print(cf)
+    conteudo.append(cf)
 
     for cl in range(num_classes):
         print("\n%s: %.2f%%" % (labels_dic[cl], cf[cl,cl]/sum(true_test==cl)*100))
+        conteudo.append("\n%s: %.2f%%" % (labels_dic[cl], cf[cl,cl]/sum(true_test==cl)*100))
 
     print(classification_report(true_test, pred_test, target_names=labels_dic.values()))
+    conteudo.append(classification_report(true_test, pred_test, target_names=labels_dic.values()))
+
+    arquivo = open(bottlebeck_path+'resultado.txt', 'w')
+    arquivo.writelines(conteudo)
+    arquivo.close()
 
 if(not os.path.exists(bottlebeck_path)):
     save_bottlebeck_features()
