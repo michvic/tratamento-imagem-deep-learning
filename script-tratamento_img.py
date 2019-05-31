@@ -62,7 +62,7 @@ for pasta in dir:
     print(count,"/",len(dir))
     if os.path.isdir(ROOT_PATH + '/' + pasta):
         labels[count] = ''.join(pasta.split('-')[0:2])  # cria os labels relacionando um dicetorio com um número
-        os.mkdir(NEW_BASE + '/'+ str(count) + "-" + labels[count])
+        os.mkdir(NEW_BASE + '/'+ str(count) + "-" + labels[count].rstrip(' '))
 
         countImg = 0
         imagens = glob.glob(ROOT_PATH + '/' + pasta + '/*' + EXTESAO_IMG)
@@ -71,7 +71,7 @@ for pasta in dir:
             image = Image.open(pathImg)
             if validaImagem(image, TAXA_DIFERENCA):
                 newImage = image.resize((num_px, num_py))
-                newImage.save(NEW_BASE + '/'+ str(count)+ '-'+ labels[count] +'/'+str(countImg)+EXTESAO_IMG )
+                newImage.save(NEW_BASE + '/'+ str(count) + "-" + labels[count].rstrip(' ')+ "/"+str(countImg)+EXTESAO_IMG)
             else:
                 continue
 
