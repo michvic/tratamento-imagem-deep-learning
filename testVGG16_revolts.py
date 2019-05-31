@@ -10,21 +10,19 @@ from keras.utils.np_utils import to_categorical # convert to one-hot-encoding
 from keras.layers import Activation, Dropout, Flatten, Dense
 from keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import confusion_matrix
-from keras.applications.vgg16 import VGG16
+from keras.applications.vgg19 import VGG19
 from keras.models import Model
 import keras as keras
 from keras.models import Sequential
+
+
 
 ext_img = '.jpg'
 num_px = 32
 num_py = 32
 base_name = './bases-testes/32-32-newbase-1' # main folder
-num_classes = 15        # number of classes
-total_imgs = 24175      # total of images considering all classes
-
-top_model_weights_path = 'bottleneck_fc_model.h5'
-bottlebeck_path = "./pesos/{}/class-{}_img-{}/".format(base_name.split("/")[-1], num_classes, total_imgs)
-
+num_classes = 20      # number of classes
+total_imgs = 27340     # total of images considering all classes
 
 ROOT_PATH = os.path.abspath(base_name)#retorna o caminho completo da pasta ./base
 dir = os.listdir(ROOT_PATH)# lista todos arquivos/pastas do diretorio ./base
@@ -84,14 +82,21 @@ print("Test shape" + str(x_test.shape))
 
 batch_size = 32
 
+# build the VGG16 network
+model = VGG19(include_top=False, weights='imagenet')
+bottlebeck_path = "./pesos-{}/{}/class-{}_img-{}/".format(model.name,base_name.split("/")[-1], num_classes, total_imgs)
+
+if (not os.path.exists("./pesos-{}/".format(model.name))):
+    os.mkdir("./pesos-{}/".format(model.name))
+elif(not os.path.exists("./pesos-{}/{}/".format(model.name,base_name.split("/")[-1]))):
+    os.mkdir("./pesos-{}/{}/".format(model.name,base_name.split("/")[-1]))
+
 def save_bottlebeck_features():
     print("------- save_bottlebeck_features -------")
     os.mkdir(bottlebeck_path)
 
     datagen = ImageDataGenerator(rescale=1. / 255)
 
-    # build the VGG16 network
-    model = VGG16(include_top=False, weights='imagenet')
 
     generator = datagen.flow(x_train, y_train, batch_size=1, shuffle=False)
 
@@ -121,9 +126,10 @@ def train_top_model():
     validation_data = np.load(open(bottlebeck_path+'bottleneck_features_validation.npy', 'rb'))
     test_data = np.load(open(bottlebeck_path+'bottleneck_features_test.npy', 'rb'))
 
+    neurons = 512
     model = Sequential()
     model.add(Flatten(input_shape=train_data.shape[1:]))
-    model.add(Dense(1024, activation='relu'))
+    model.add(Dense(neurons, activation='relu'))
     model.add(Dropout(0.5))
     model.add(Dense(num_classes, activation='softmax'))
 
@@ -138,7 +144,7 @@ def train_top_model():
               validation_data=(validation_data, y_val),
               callbacks=[reduce_lr]
               )
-    model.save_weights(top_model_weights_path)
+    model.save_weights(bottlebeck_path+'bottleneck_fc_model-{}.h5'.format(neurons))
     model.summary()
 
     scores = model.evaluate(test_data, y_test, batch_size=1, verbose=0)
@@ -154,7 +160,7 @@ def train_top_model():
 
     print(classification_report(true_test, pred_test, target_names=labels_dic.values()))
 
-if(not os.path.exists("./pesos/{}/class-{}_img-{}/".format(base_name.split("/")[-1],num_classes,total_imgs))):
+if(not os.path.exists(bottlebeck_path)):
     save_bottlebeck_features()
 train_top_model()
 

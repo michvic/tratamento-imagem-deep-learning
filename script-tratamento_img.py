@@ -8,10 +8,10 @@ import os
 import glob
 
 EXTESAO_IMG = '.jpg'
-TAXA_DIFERENCA = 0.4
+TAXA_DIFERENCA = 0.1
 
-num_px = 100
-num_py = 100
+num_px =224
+num_py = 224
 
 
 def validaImagem(imagem : Image, taxaDeDiferenca=None) -> bool:
@@ -91,15 +91,14 @@ for pasta in dir:
         count += 1
 
 
-
 data[0].insert(0,'Total')
 data[1].insert(0,sum(data[1]))
 data[2].insert(0,sum(data[2]))
 
-data[0].append('detalhes')
+data[0].append('Detalhes')
 data[1].append('taxa de deferença:' + str(TAXA_DIFERENCA))
 data[2].append("Dimensão: ({},{})".format(num_px,num_py))
 
 df = pd.DataFrame(data= np.array(data).T,columns=['Classes','Nº Imagens pré tratamento','Nº Imagens pós tratamento'])
-df.to_csv(NEW_BASE+'/dados da base.csv')
+df.to_csv(NEW_BASE+'/dados da base ({}x{}).csv'.format(num_px, num_py))
 
