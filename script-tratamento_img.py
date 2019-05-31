@@ -8,10 +8,10 @@ import os
 import glob
 
 EXTESAO_IMG = '.jpg'
-TAXA_DIFERENCA = 0.1
+TAXA_DIFERENCA = 0
 
-num_px =224
-num_py = 224
+num_px = 32
+num_py = 32
 
 
 def validaImagem(imagem : Image, taxaDeDiferenca=None) -> bool:
@@ -26,8 +26,8 @@ def validaImagem(imagem : Image, taxaDeDiferenca=None) -> bool:
 
 def paths(baseFolderName):
     ROOT_PATH = ''
-    name = str(num_px) + '-' + str(num_py)+ '-' +"new" + baseFolderName +'-1'
-
+    name = str(num_px) + '-' + str(num_py)+ '-' +"new" + baseFolderName +'-'
+    cont = 1
     if os.path.exists('./'+baseFolderName):
         ROOT_PATH = os.path.abspath('./'+baseFolderName)  # retorna o caminho completo da base de imagem
     else:
@@ -35,15 +35,14 @@ def paths(baseFolderName):
         exit()
 
     while True:
-        if os.path.exists('./'+name):
-            name = name.split('-')
-            name = name[0:3] + '-' + str(int(name[1]) + 1)
+        if os.path.exists('./'+name + str(cont)):
+            cont += 1
         else:
-            os.mkdir(name)
+            os.mkdir(name + str(cont))
 
             break
 
-    NEW_BASE = os.path.abspath('./' + name)
+    NEW_BASE = os.path.abspath('./' + name+str(cont))
 
     return ROOT_PATH, NEW_BASE
 
