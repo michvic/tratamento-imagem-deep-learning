@@ -10,8 +10,8 @@ import glob
 EXTESAO_IMG = '.jpg'
 TAXA_DIFERENCA = 0.2
 
-num_px = 64
-num_py = 64
+num_px = 100
+num_py = 100
 
 def validaImagem(imagem : Image, taxaDeDiferenca=None) -> bool:
     width, height = 0, 0

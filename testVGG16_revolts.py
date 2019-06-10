@@ -7,6 +7,7 @@ import glob
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from keras.utils.np_utils import to_categorical # convert to one-hot-encoding
+from keras.utils import plot_model
 from keras.layers import Activation, Dropout, Flatten, Dense
 from keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import confusion_matrix
@@ -16,13 +17,12 @@ import keras as keras
 from keras.models import Sequential
 
 
-
 ext_img = '.jpg'
-num_px = 32
-num_py = 32
-base_name = './bases-testes/class' # main folder
-num_classes = 1      # number of classes
-total_imgs = 149     # total of images considering all classes
+num_px = 64
+num_py = 64
+base_name = './bases-testes/64-64-newbase-1' # main folder
+num_classes = 10     # number of classes
+total_imgs = 13964     # total of images considering all classes
 
 ROOT_PATH = os.path.abspath(base_name)#retorna o caminho completo da pasta ./base
 dir = os.listdir(ROOT_PATH)# lista todos arquivos/pastas do diretorio ./base
@@ -88,7 +88,7 @@ bottlebeck_path = "./pesos-{}/{}/class-{}_img-{}/".format(model.name,base_name.s
 
 if (not os.path.exists("./pesos-{}/".format(model.name))):
     os.mkdir("./pesos-{}/".format(model.name))
-elif(not os.path.exists("./pesos-{}/{}/".format(model.name,base_name.split("/")[-1]))):
+if(not os.path.exists("./pesos-{}/{}/".format(model.name,base_name.split("/")[-1]))):
     os.mkdir("./pesos-{}/{}/".format(model.name,base_name.split("/")[-1]))
 
 def save_bottlebeck_features():
@@ -124,8 +124,9 @@ def train_top_model():
     print("------- train_top_model -------")
     if(not os.path.exists(bottlebeck_path+'resultado.txt')):
         arquivo = open(bottlebeck_path+'resultado.txt', 'w')
-    else:
-        arquivo = open(bottlebeck_path+'resultado.txt', 'r')
+        arquivo.close()
+
+    arquivo = open(bottlebeck_path+'resultado.txt', 'r')
 
     conteudo = arquivo.readlines()
     conteudo.append('#####################################################################################################')
@@ -155,7 +156,6 @@ def train_top_model():
               )
     model.save_weights(bottlebeck_path+'bottleneck_fc_model-{}.h5'.format(neurons))
     model.summary()
-    conteudo.append(model.summary())
 
     scores = model.evaluate(test_data, y_test, batch_size=1, verbose=0)
     print("\n%s: %.2f%% (Test)" % (model.metrics_names[1], scores[1]*100))
@@ -165,14 +165,14 @@ def train_top_model():
     true_test = np.argmax(y_test, axis=1)
     cf = confusion_matrix(true_test, pred_test)
     print(cf)
-    conteudo.append(cf)
+    conteudo.append("\n"+str(cf))
 
     for cl in range(num_classes):
         print("\n%s: %.2f%%" % (labels_dic[cl], cf[cl,cl]/sum(true_test==cl)*100))
         conteudo.append("\n%s: %.2f%%" % (labels_dic[cl], cf[cl,cl]/sum(true_test==cl)*100))
 
     print(classification_report(true_test, pred_test, target_names=labels_dic.values()))
-    conteudo.append(classification_report(true_test, pred_test, target_names=labels_dic.values()))
+    conteudo.append("\n"+str(classification_report(true_test, pred_test, target_names=labels_dic.values())))
 
     arquivo = open(bottlebeck_path+'resultado.txt', 'w')
     arquivo.writelines(conteudo)
